@@ -79,14 +79,18 @@ app.put("/addtocart/:id/:user", async (req, res) => {
       .collection("Eusers")
       .findOne({ _id: new ObjectId(user) });
     const getCart = checkUser.cart;
-    const addcart = {
-      cart: [...getCart, checkData],
-    };
-    const addCart = await client
-      .db("b42wd2")
-      .collection("Eusers")
-      .updateOne({ _id: new ObjectId(user) }, { $set: addcart });
-    res.status(200).send({ message: "updated successfully" });
+    if (!getCart.some((item) => item._id.toString() === id)) {
+      const addcart = {
+        cart: [...getCart, checkData],
+      };
+      const addCart = await client
+        .db("b42wd2")
+        .collection("Eusers")
+        .updateOne({ _id: new ObjectId(user) }, { $set: addcart });
+      res.status(200).send({ message: "Added to Cart" });
+    } else {
+      res.status(200).send({ message: "Already added to cart" });
+    }
   } catch (err) {
     console.log(err);
   }
