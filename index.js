@@ -18,6 +18,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("welcome to E kart");
 });
+
+//get all products
 app.get("/products", async (req, res) => {
   try {
     const getdata = await client
@@ -30,15 +32,19 @@ app.get("/products", async (req, res) => {
     res.send("internal server error");
   }
 });
-app.post("/add/data", async (req, res) => {
-  const data = req.body;
-  const addData = await client
-    .db("b42wd2")
-    .collection("Eproducts")
-    .insertMany(data);
-  res.send("inserted succcesfully");
-});
 
+//to add products to the website
+
+// app.post("/add/data", async (req, res) => {
+//   const data = req.body;
+//   const addData = await client
+//     .db("b42wd2")
+//     .collection("Eproducts")
+//     .insertMany(data);
+//   res.send("inserted succcesfully");
+// });
+
+//temp login
 app.post("/login", async (req, res) => {
   const { name, password } = req.body;
   const data = {
@@ -49,6 +55,8 @@ app.post("/login", async (req, res) => {
   const storeUser = client.db("b42wd2").collection("Eusers").insertOne(data);
   res.send("inserted succcesfully");
 });
+
+//to get cart items
 app.get("/cart/:user", async (req, res) => {
   const { user } = req.params;
   const User = await client
@@ -57,6 +65,8 @@ app.get("/cart/:user", async (req, res) => {
     .findOne({ _id: new ObjectId(user) });
   res.status(200).send(User);
 });
+
+// add products to the cart
 app.put("/addtocart/:id/:user", async (req, res) => {
   const { id, user } = req.params;
   try {
@@ -80,6 +90,31 @@ app.put("/addtocart/:id/:user", async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+//delete cart
+
+app.delete("/delete/:id/:user", async (req, res) => {
+  const { id, user } = req.params;
+  console.log(new ObjectId(id), user);
+  const checkData = await client
+    .db("b42wd2")
+    .collection("Eproducts")
+    .findOne({ _id: new ObjectId(id) });
+  const checkUser = await client
+    .db("b42wd2")
+    .collection("Eusers")
+    .findOne({ _id: new ObjectId(user) });
+  const getCart = checkUser.cart;
+  const deleteCart = getCart.filter((item) => item.name !== checkData.name);
+  const updatedCart = {
+    cart: deleteCart,
+  };
+  const addCart = await client
+    .db("b42wd2")
+    .collection("Eusers")
+    .updateOne({ _id: new ObjectId(user) }, { $set: updatedCart });
+  res.send(deleteCart);
 });
 
 app.listen(Port, () => console.log(`${Port} is running`));
