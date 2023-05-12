@@ -74,6 +74,7 @@ app.put("/addtocart/:id/:user", async (req, res) => {
       .db("b42wd2")
       .collection("Eproducts")
       .findOne({ _id: new ObjectId(id) });
+
     const checkUser = await client
       .db("b42wd2")
       .collection("Eusers")
@@ -96,11 +97,41 @@ app.put("/addtocart/:id/:user", async (req, res) => {
   }
 });
 
+//update quantity
+
+app.put("/quantity/:id/:user", async (req, res) => {
+  const newKey = "quantity";
+  const { id, user } = req.params;
+  const { number } = req.body;
+  const checkData = await client
+    .db("b42wd2")
+    .collection("Eproducts")
+    .findOne({ _id: new ObjectId(id) });
+  const checkUser = await client
+    .db("b42wd2")
+    .collection("Eusers")
+    .findOne({ _id: new ObjectId(user) });
+  const getCart = checkUser.cart;
+  const check = getCart.findIndex(
+    (item) => item._id.toString() === checkData._id.toString()
+  );
+  checkData[newKey] = number;
+  getCart[check] = checkData;
+  console.log(getCart);
+  const addcart = {
+    cart: getCart,
+  };
+  const addCart = await client
+    .db("b42wd2")
+    .collection("Eusers")
+    .updateOne({ _id: new ObjectId(user) }, { $set: addcart });
+  res.status(200).send("Updated successfully");
+});
+
 //delete cart
 
 app.delete("/delete/:id/:user", async (req, res) => {
   const { id, user } = req.params;
-  console.log(new ObjectId(id), user);
   const checkData = await client
     .db("b42wd2")
     .collection("Eproducts")
@@ -120,5 +151,7 @@ app.delete("/delete/:id/:user", async (req, res) => {
     .updateOne({ _id: new ObjectId(user) }, { $set: updatedCart });
   res.send(deleteCart);
 });
+
+//update quantity
 
 app.listen(Port, () => console.log(`${Port} is running`));
