@@ -27,7 +27,7 @@ app.get("/products", async (req, res) => {
       .collection("Eproducts")
       .find({})
       .toArray();
-    res.send(getdata);
+    res.status(200).send(getdata);
   } catch (e) {
     res.send("internal server error");
   }
@@ -152,6 +152,20 @@ app.delete("/delete/:id/:user", async (req, res) => {
   res.send(deleteCart);
 });
 
-//update quantity
+//search
+app.get("/products/search/:key", async (req, res) => {
+  const { key } = req.params;
+  console.log(key);
+  if (key) {
+    const getdata = await client
+      .db("b42wd2")
+      .collection("Eproducts")
+      .find({ name: new RegExp(key, "i") })
+      .toArray();
+    res.status(200).send(getdata);
+  } else {
+    res.status(404).send({ message: "internal server error" });
+  }
+});
 
 app.listen(Port, () => console.log(`${Port} is running`));
