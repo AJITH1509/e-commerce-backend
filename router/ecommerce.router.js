@@ -5,7 +5,6 @@ import {
   updateCart,
   searchProduct,
 } from "../service/ecommerce.service.js";
-import { app } from "../index.js";
 import express from "express";
 import { auth } from "../auth.js";
 
@@ -14,6 +13,14 @@ const router = express.Router();
 router.get("/", (req, res) => {
   res.send("welcome to E kart");
 });
+
+// get user by id
+router.get("/profile/:user", async (req, res) => {
+  const { user } = req.params;
+  const User = await getUser(user);
+  res.status(200).send(User);
+});
+
 //get all products
 router.get("/products", async (req, res) => {
   try {
@@ -23,16 +30,8 @@ router.get("/products", async (req, res) => {
     res.send("internal server error");
   }
 });
-//to add products to the website
-// app.post("/add/data", async (req, res) => {
-//   const data = req.body;
-//   const addData = await client
-//     .db("b42wd2")
-//     .collection("Eproducts")
-//     .insertMany(data);
-//   res.send("inserted succcesfully");
-// });
-//to get cart items
+
+// to get cart items
 router.get("/cart/:user", async (req, res) => {
   const { user } = req.params;
   const User = await getUser(user);
@@ -103,3 +102,13 @@ router.get("/products/search/:key", async (req, res) => {
 });
 
 export default router;
+
+//to add products to the website
+// app.post("/add/data", async (req, res) => {
+//   const data = req.body;
+//   const addData = await client
+//     .db("b42wd2")
+//     .collection("Eproducts")
+//     .insertMany(data);
+//   res.send("inserted succcesfully");
+// });

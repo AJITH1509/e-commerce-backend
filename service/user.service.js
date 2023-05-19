@@ -10,18 +10,22 @@ export async function updatePassword(email, hashedPassword) {
     .collection("Eusers")
     .updateOne({ email: email }, { $set: updated });
 }
+
 export async function getUserByName(email) {
   return await client
     .db("b42wd2")
     .collection("Eusers")
     .findOne({ email: email });
 }
+
 export async function getOtp(OTP) {
   return await client.db("b42wd2").collection("Eusers").findOne({ OTP: OTP });
 }
+
 export async function addUser(data) {
   return await client.db("b42wd2").collection("Eusers").insertOne(data);
 }
+
 export async function updateOtp(email, randomNumber) {
   const updated = {
     OTP: randomNumber,
@@ -31,6 +35,7 @@ export async function updateOtp(email, randomNumber) {
     .collection("Eusers")
     .updateOne({ email: email }, { $set: updated });
 }
+
 export async function deleteOtp(otp) {
   const data = {
     OTP: otp,
@@ -40,6 +45,7 @@ export async function deleteOtp(otp) {
     .collection("Eusers")
     .updateOne({ OTP: otp }, { $unset: data });
 }
+
 export async function updateName(id, Updated) {
   return await client
     .db("b42wd2")
